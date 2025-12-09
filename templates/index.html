@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="fas fa-network-wired"></i> Network Security Scanner & Firewall Visualizer</h1>
+        <p class="lead">Comprehensive network scanning and firewall simulation tool</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Network Scanner Section -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-search"></i> Network Scanner</h5>
+            </div>
+            <div class="card-body">
+                <form id="scanForm">
+                    <div class="mb-3">
+                        <label for="target" class="form-label">Target IP/Hostname:</label>
+                        <input type="text" class="form-control" id="target"
+                               placeholder="e.g., 192.168.1.1 or scanme.nmap.org" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="scanType" class="form-label">Scan Type:</label>
+                        <select class="form-select" id="scanType">
+                            <option value="tcp_syn">TCP SYN Scan (Stealth)</option>
+                            <option value="full_connect">TCP Connect Scan</option>
+                            <option value="udp">UDP Scan</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ports" class="form-label">Ports:</label>
+                        <input type="text" class="form-control" id="ports"
+                               placeholder="e.g., 1-1000 or 80,443,22" value="1-1000">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="scanBtn">
+                        <i class="fas fa-play"></i> Start Scan
+                    </button>
+                </form>
+
+                <div id="scanProgress" class="mt-3" style="display: none;">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width: 100%">Scanning...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scan Results -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Scan Results</h5>
+            </div>
+            <div class="card-body">
+                <div id="scanResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firewall Section -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-fire"></i> Firewall Rules</h5>
+            </div>
+            <div class="card-body">
+                <form id="firewallRuleForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="ruleName" class="form-label">Rule Name:</label>
+                                <input type="text" class="form-control" id="ruleName" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="ruleAction" class="form-label">Action:</label>
+                                <select class="form-select" id="ruleAction" required>
+                                    <option value="allow">Allow</option>
+                                    <option value="deny">Deny</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="sourceIP" class="form-label">Source IP:</label>
+                                <input type="text" class="form-control" id="sourceIP"
+                                       placeholder="any or specific IP">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="destinationIP" class="form-label">Destination IP:</label>
+                                <input type="text" class="form-control" id="destinationIP"
+                                       placeholder="any or specific IP">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="protocol" class="form-label">Protocol:</label>
+                                <select class="form-select" id="protocol">
+                                    <option value="any">Any</option>
+                                    <option value="tcp">TCP</option>
+                                    <option value="udp">UDP</option>
+                                    <option value="icmp">ICMP</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="port" class="form-label">Port:</label>
+                                <input type="text" class="form-control" id="port"
+                                       placeholder="any or 80 or 1-1000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Rule
+                    </button>
+                </form>
+
+                <div id="firewallRules" class="mt-3"></div>
+            </div>
+        </div>
+
+        <!-- Packet Testing -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-vial"></i> Test Packet</h5>
+            </div>
+            <div class="card-body">
+                <form id="packetTestForm" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Source IP"
+                               id="testSourceIP" value="192.168.1.100">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Dest IP"
+                               id="testDestIP" value="192.168.1.1">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="testProtocol">
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" placeholder="Port"
+                               id="testPort" value="80">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-info w-100">Test</button>
+                    </div>
+                </form>
+                <div id="packetTestResult" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visualization Section -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-project-diagram"></i> Network Visualization</h5>
+            </div>
+            <div class="card-body text-center">
+                <button id="generateViz" class="btn btn-primary mb-3">
+                    <i class="fas fa-sync-alt"></i> Generate Visualization
+                </button>
+                <div id="visualizationContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
